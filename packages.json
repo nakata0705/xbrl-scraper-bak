@@ -1,0 +1,5 @@
+{
+    "phantomjs": "1.9.18",
+    "casperjs": "1.1.0-beta3",
+    "path": "0.11.14"
+}
