@@ -6,7 +6,7 @@ var g_unzippath = '/usr/bin/unzip';
 var g_nkfpath = '/usr/bin/nkf';
 var g_edinetcodezip = 'edinetcode.zip'
 var g_edinetcodecsv = 'EdinetcodeDlInfo.csv';
-var g_edinetcodeutf8csv = 'EdinetcodeDlInfo_UTF8.csv';
+var g_edinetcodeutf8csv = 'EdinetCode_UTF8.csv';
 
 // Initialize PhantomJS fs
 var fs = require('fs');
@@ -82,7 +82,7 @@ casper.waitForFileExec(g_unzippath, ['-o', g_edinetcodezip], function (err, stdo
     }
     else {
         this.echo('Calling nkf to convert SJIS csv to UTF-8 csv');
-        casper.waitForFileExec(g_nkfpath, ['-w', '-Lu', g_edinetcodecsv], function (err, stdout, stderr) {
+        casper.waitForFileExec(g_nkfpath, ['-w', '-Lu', '-d', g_edinetcodecsv], function (err, stdout, stderr) {
             fs.write(g_edinetcodeutf8csv, stdout, 'w');
         }, function() {
             this.echo('Failed to nkf: Timeout');

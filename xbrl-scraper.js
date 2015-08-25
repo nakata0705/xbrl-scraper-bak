@@ -1,5 +1,5 @@
 var tempCollection = new Mongo.Collection("tempCollection");
-var serverPath = '';
+var edinetcodeCollection = new Mongo.Collection("edinetcodeCollection");
 
 if (Meteor.isClient) {
   // counter starts at 0
@@ -11,14 +11,8 @@ if (Meteor.isClient) {
     counter: function () {
       return Session.get('counter');
     },
-    body: function() {
-      var entry =  tempCollection.findOne({ id: 0 });
-      if (!entry) {
-        return '';
-      }
-      else {
-        return entry.body;
-      }
+    edinetcodes: function() {
+      return edinetcodeCollection.find({});
     }
   });
 
@@ -33,7 +27,6 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
   Meteor.startup(function () {
     // code to run on server at startup
-    serverPath = process.env["PWD"] + "/public/";
   });
 }
 
@@ -41,14 +34,36 @@ Meteor.methods({
   phantomJSTest: function () {
     console.log("phantomJSTest");
     
-    //var Future = Meteor.npmRequire("fibers/future");
     var Fs = Meteor.npmRequire('fs');
-    var exec = Meteor.wrapAsync(Npm.require('child_process').exec);
+    var exec = Meteor.wrapAsync(Meteor.npmRequire('child_process').exec);
+    var parse = Meteor.npmRequire('csv').parse;
+
+    //var result = exec('casperjs --ignore-ssl-errors=yes assets/app/casperjs/getedinetcodelist.js');
     
-    //var future = new Future();
-    var result = exec('casperjs --ignore-ssl-errors=yes assets/app/casperjs/getedinetcodelist.js');
-    var content = Fs.readFileSync('EdinetcodeDlInfo_UTF8.csv');
-    console.log(content.toString());
+    // Parse CSV
+    var source = Fs.createReadStream('assets/app/casperjs/EdinetCode_UTF8.csv');
+    var parser = parse({ 'auto_parse': true, 'columns': ['edinetcode', 'orgtype', 'listtype', 'consolidated', 'capital', 'settlementday', 'name', 'name_en', 'name_kana', 'address', 'sector', 'ticker_jp'] });
+    
+    parser.on('readable', Meteor.bindEnvironment(function() {
+      var record;
+      while(record = parser.read()) {
+        var entry = edinetcodeCollection.findOne({ 'edinetcode': record.edinetcode });
+        if (!entry && record.edinetcode.match(/E\d+/) != null) {
+          edinetcodeCollection.insert(record);
+        }
+      }
+    }));
+    
+    /*source.on('error', function(err) {
+      console.log(err);
+    });
+    
+    source.on('end', function() {
+      console.log('end');
+    });*/
+    
+    source.pipe(parser);
+    //source.pipe(process.stdout);
     
     /*var newbody = { id: 0, body: content };
     var oldbody = tempCollection.findOne({ id: 0 });

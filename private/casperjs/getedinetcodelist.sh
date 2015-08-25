@@ -1,3 +1,3 @@
 #!/bin/bash
 
- casperjs --ignore-ssl-errors=yes getdedinetcodelist.js
+ casperjs --ignore-ssl-errors=yes getedinetcodelist.js

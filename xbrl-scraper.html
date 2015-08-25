@@ -4,12 +4,19 @@
 
 <body>
   <h1>Welcome to Meteor!</h1>
-
   {{> hello}}
 </body>
 
 <template name="hello">
   <button>Click Me</button>
   <p>You've pressed the button {{counter}} times.</p>
-  <div>{{body}}</div>
+  <ul>
+    {{#each edinetcodes}}
+      {{> edinetcode}}
+    {{/each}}
+  </ul>
+</template>
+
+<template name="edinetcode">
+  <li>{{edinetcode}} {{orgtype}} {{listtype}} {{consolidated}} {{capital}} {{settlementday}} {{name}} {{name_en}} {{name_kana}} {{address}} {{sector}} {{ticker_jp}}</li>
 </template>
