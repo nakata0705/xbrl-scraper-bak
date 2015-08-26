@@ -38,9 +38,11 @@ Meteor.methods({
     var exec = Meteor.wrapAsync(Meteor.npmRequire('child_process').exec);
     var parse = Meteor.npmRequire('csv').parse;
 
-    //var result = exec('casperjs --ignore-ssl-errors=yes assets/app/casperjs/getedinetcodelist.js');
+    console.log('calling casperjs');
+    var result = exec('casperjs --ignore-ssl-errors=yes assets/app/casperjs/getedinetcodelist.js');
     
     // Parse CSV
+    console.log('parsing downloaded csv');
     var source = Fs.createReadStream('assets/app/casperjs/EdinetCode_UTF8.csv');
     var parser = parse({ 'auto_parse': true, 'columns': ['edinetcode', 'orgtype', 'listtype', 'consolidated', 'capital', 'settlementday', 'name', 'name_en', 'name_kana', 'address', 'sector', 'ticker_jp'] });
     
@@ -63,6 +65,8 @@ Meteor.methods({
     });*/
     
     source.pipe(parser);
+    
+    console.log('end');
     //source.pipe(process.stdout);
     
     /*var newbody = { id: 0, body: content };
